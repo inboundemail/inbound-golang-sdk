@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/R44VC0RP/inbound-go"
+	"github.com/R44VC0RP/inbound-golang-sdk"
 )
 
 func TestEmailScheduling(t *testing.T) {

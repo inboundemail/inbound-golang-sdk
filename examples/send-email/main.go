@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	inbound "github.com/R44VC0RP/inbound-go"
+	inbound "github.com/R44VC0RP/inbound-golang-sdk"
 )
 
 func main() {

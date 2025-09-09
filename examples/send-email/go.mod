@@ -2,6 +2,6 @@ module send-email-example
 
 go 1.21
 
-require github.com/R44VC0RP/inbound-go v0.1.0
+require github.com/R44VC0RP/inbound-golang-sdk v0.1.0
 
-replace github.com/R44VC0RP/inbound-go => ../..
+replace github.com/R44VC0RP/inbound-golang-sdk => ../..

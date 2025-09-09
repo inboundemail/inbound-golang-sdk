@@ -1,7 +1,7 @@
 # Inbound Go SDK
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/R44VC0RP/inbound-go.svg)](https://pkg.go.dev/github.com/R44VC0RP/inbound-go)
-[![Go Report Card](https://goreportcard.com/badge/github.com/R44VC0RP/inbound-go)](https://goreportcard.com/report/github.com/R44VC0RP/inbound-go)
+[![Go Reference](https://pkg.go.dev/badge/github.com/R44VC0RP/inbound-golang-sdk.svg)](https://pkg.go.dev/github.com/R44VC0RP/inbound-golang-sdk)
+[![Go Report Card](https://goreportcard.com/badge/github.com/R44VC0RP/inbound-golang-sdk)](https://goreportcard.com/report/github.com/R44VC0RP/inbound-golang-sdk)
 
 A Go SDK for [Inbound](https://inbound.new) - Email infrastructure made simple for Go developers.
 
@@ -10,7 +10,7 @@ A Go SDK for [Inbound](https://inbound.new) - Email infrastructure made simple f
 ### Installation
 
 ```bash
-go get github.com/R44VC0RP/inbound-go
+go get github.com/R44VC0RP/inbound-golang-sdk
 ```
 
 ### Send your first email
@@ -23,7 +23,7 @@ import (
     "fmt"
     "log"
 
-    inbound "github.com/R44VC0RP/inbound-go"
+    inbound "github.com/R44VC0RP/inbound-golang-sdk"
 )
 
 func main() {
@@ -335,17 +335,6 @@ cd examples
 go run send-email/main.go
 ```
 
-## 🤝 Contributing
-
-We welcome contributions! Please see the [contributing guidelines](https://github.com/R44VC0RP/inbound/blob/main/CONTRIBUTING.md) in the main repository.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Add tests if applicable
-5. Commit your changes (`git commit -am 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
 
 ## 📄 License
 
@@ -356,7 +345,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Main Inbound Repository](https://github.com/R44VC0RP/inbound)
 - [Inbound Website](https://inbound.new)
 - [API Documentation](https://docs.inbound.new)
-- [Go Package Documentation](https://pkg.go.dev/github.com/R44VC0RP/inbound-go)
+- [Go Package Documentation](https://pkg.go.dev/github.com/R44VC0RP/inbound-golang-sdk)
 
 ---
 

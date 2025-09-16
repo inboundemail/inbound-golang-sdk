@@ -559,3 +559,73 @@ type DeleteScheduledEmailResponse struct {
 	Status      string `json:"status"` // 'cancelled'
 	CancelledAt string `json:"cancelled_at"`
 }
+
+// Webhook Payload Types - for incoming email.received webhooks
+type WebhookPayload struct {
+	Event     string              `json:"event"`
+	Timestamp string              `json:"timestamp"`
+	Email     WebhookEmailData    `json:"email"`
+	Endpoint  *WebhookEndpointRef `json:"endpoint,omitempty"`
+}
+
+type WebhookEmailData struct {
+	ID             string                 `json:"id"`
+	MessageID      string                 `json:"messageId"`
+	From           WebhookAddressGroup    `json:"from"`
+	To             WebhookAddressGroup    `json:"to"`
+	Recipient      string                 `json:"recipient"`
+	Subject        string                 `json:"subject"`
+	ReceivedAt     string                 `json:"receivedAt"`
+	ParsedData     WebhookParsedData      `json:"parsedData"`
+	CleanedContent *WebhookCleanedContent `json:"cleanedContent,omitempty"`
+}
+
+type WebhookAddressGroup struct {
+	Text      string           `json:"text"`
+	Addresses []WebhookAddress `json:"addresses"`
+}
+
+type WebhookAddress struct {
+	Name    *string `json:"name"`
+	Address string  `json:"address"`
+}
+
+type WebhookParsedData struct {
+	MessageID   string               `json:"messageId"`
+	Date        any                  `json:"date"` // Can be string or Date object
+	Subject     string               `json:"subject"`
+	From        WebhookAddressGroup  `json:"from"`
+	To          WebhookAddressGroup  `json:"to"`
+	Cc          *WebhookAddressGroup `json:"cc"`
+	Bcc         *WebhookAddressGroup `json:"bcc"`
+	ReplyTo     *WebhookAddressGroup `json:"replyTo"`
+	InReplyTo   *string              `json:"inReplyTo,omitempty"`
+	References  *string              `json:"references,omitempty"`
+	TextBody    string               `json:"textBody"`
+	HTMLBody    string               `json:"htmlBody"`
+	Attachments []WebhookAttachment  `json:"attachments"`
+	Headers     map[string]any       `json:"headers"`
+	Priority    *string              `json:"priority,omitempty"`
+}
+
+type WebhookCleanedContent struct {
+	HTML        string              `json:"html"`
+	Text        string              `json:"text"`
+	HasHTML     bool                `json:"hasHtml"`
+	HasText     bool                `json:"hasText"`
+	Attachments []WebhookAttachment `json:"attachments"`
+	Headers     map[string]any      `json:"headers"`
+}
+
+type WebhookAttachment struct {
+	Filename    string `json:"filename"`
+	ContentType string `json:"contentType"`
+	ContentID   string `json:"contentId"`
+	URL         string `json:"url"`
+}
+
+type WebhookEndpointRef struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}

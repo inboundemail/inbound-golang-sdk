@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	inboundgo "github.com/R44VC0RP/inbound-golang-sdk"
+	inboundgo "github.com/inboundemail/inbound-golang-sdk"
 )
 
 func TestIdempotencyKeySupport(t *testing.T) {

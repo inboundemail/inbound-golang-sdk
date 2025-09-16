@@ -1,7 +1,7 @@
 # Inbound Go SDK
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/R44VC0RP/inbound-golang-sdk.svg)](https://pkg.go.dev/github.com/R44VC0RP/inbound-golang-sdk)
-[![Go Report Card](https://goreportcard.com/badge/github.com/R44VC0RP/inbound-golang-sdk)](https://goreportcard.com/report/github.com/R44VC0RP/inbound-golang-sdk)
+[![Go Reference](https://pkg.go.dev/badge/github.com/inboundemail/inbound-golang-sdk.svg)](https://pkg.go.dev/github.com/inboundemail/inbound-golang-sdk)
+[![Go Report Card](https://goreportcard.com/badge/github.com/inboundemail/inbound-golang-sdk)](https://goreportcard.com/report/github.com/inboundemail/inbound-golang-sdk)
 
 A Go SDK for [Inbound](https://inbound.new) - Email infrastructure made simple for Go developers.
 
@@ -10,7 +10,7 @@ A Go SDK for [Inbound](https://inbound.new) - Email infrastructure made simple f
 ### Installation
 
 ```bash
-go get github.com/R44VC0RP/inbound-golang-sdk
+go get github.com/inboundemail/inbound-golang-sdk
 ```
 
 ### Send your first email
@@ -23,7 +23,7 @@ import (
     "fmt"
     "log"
 
-    inbound "github.com/R44VC0RP/inbound-golang-sdk"
+    inbound "github.com/inboundemail/inbound-golang-sdk"
 )
 
 func main() {
@@ -342,10 +342,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- [Main Inbound Repository](https://github.com/R44VC0RP/inbound)
+- [Main Inbound Repository](https://github.com/inboundemail/inbound)
 - [Inbound Website](https://inbound.new)
 - [API Documentation](https://docs.inbound.new)
-- [Go Package Documentation](https://pkg.go.dev/github.com/R44VC0RP/inbound-golang-sdk)
+- [Go Package Documentation](https://pkg.go.dev/github.com/inboundemail/inbound-golang-sdk)
 
 ---
 

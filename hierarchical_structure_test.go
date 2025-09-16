@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/R44VC0RP/inbound-golang-sdk"
+	"github.com/inboundemail/inbound-golang-sdk"
 )
 
 // Helper function to check if error is a network-related error

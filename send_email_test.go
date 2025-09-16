@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/R44VC0RP/inbound-golang-sdk"
+	"github.com/inboundemail/inbound-golang-sdk"
 )
 
 func TestEmailSending(t *testing.T) {

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-01-16
+
+### Added
+- **Webhook Support**: Complete webhook payload parsing for inbound emails
+  - `WebhookPayload` type matching official Inbound documentation structure
+  - Support for `email.received` webhook events with nested email data
+  - `WebhookEmailData`, `WebhookParsedData`, and `WebhookCleanedContent` types
+  - `WebhookAddressGroup` and `WebhookAddress` for email address handling
+  - `WebhookAttachment` type for email attachments in webhooks
+  - `ParseWebhookPayload()` function for parsing incoming webhook requests
+  - Helper methods: `GetFromAddress()`, `GetToAddress()`, `GetHeaders()`
+  - Support for both `parsedData` and `cleanedContent` from webhook payloads
+  - Complex header parsing (strings, arrays, objects like DKIM signatures)
+  - Comprehensive webhook parsing tests with edge case coverage
+
+### Technical Details
+- Added `webhook.go` with webhook parsing utilities
+- Added `webhook_test.go` with comprehensive test coverage
+- Updated type definitions to match official Inbound webhook structure
+- Support for flexible date handling (string or Date object)
+- Proper handling of optional fields and null values
+
 ## [0.1.0] - 2024-01-XX
 
 ### Added

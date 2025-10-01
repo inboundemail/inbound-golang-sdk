@@ -551,6 +551,67 @@ func (s *EndpointService) Test(ctx context.Context, id string) (*ApiResponse[any
 	return makeRequest[any](s.client, ctx, "POST", endpoint, nil, nil)
 }
 
+// ThreadService handles thread management
+type ThreadService struct {
+	client *Inbound
+}
+
+// NewThreadService creates a new thread service
+func NewThreadService(client *Inbound) *ThreadService {
+	return &ThreadService{client: client}
+}
+
+// List retrieves all email threads with optional filtering
+//
+// API Reference: https://docs.inbound.new/api-reference/threads/list-threads
+func (s *ThreadService) List(ctx context.Context, params *GetThreadsRequest) (*ApiResponse[GetThreadsResponse], error) {
+	endpoint := "/threads" + buildQueryString(params)
+	return makeRequest[GetThreadsResponse](s.client, ctx, "GET", endpoint, nil, nil)
+}
+
+// Get retrieves a specific thread by ID with all messages
+//
+// API Reference: https://docs.inbound.new/api-reference/threads/get-thread
+func (s *ThreadService) Get(ctx context.Context, id string) (*ApiResponse[GetThreadByIDResponse], error) {
+	endpoint := fmt.Sprintf("/threads/%s", id)
+	return makeRequest[GetThreadByIDResponse](s.client, ctx, "GET", endpoint, nil, nil)
+}
+
+// PerformAction performs an action on a thread (mark as read, archive, etc.)
+//
+// API Reference: https://docs.inbound.new/api-reference/threads/thread-actions
+func (s *ThreadService) PerformAction(ctx context.Context, id string, params *PostThreadActionsRequest) (*ApiResponse[PostThreadActionsResponse], error) {
+	endpoint := fmt.Sprintf("/threads/%s/actions", id)
+	return makeRequest[PostThreadActionsResponse](s.client, ctx, "POST", endpoint, params, nil)
+}
+
+// Stats retrieves statistics about all threads
+//
+// API Reference: https://docs.inbound.new/api-reference/threads/thread-stats
+func (s *ThreadService) Stats(ctx context.Context) (*ApiResponse[GetThreadStatsResponse], error) {
+	return makeRequest[GetThreadStatsResponse](s.client, ctx, "GET", "/threads/stats", nil, nil)
+}
+
+// MarkAsRead marks all messages in a thread as read
+func (s *ThreadService) MarkAsRead(ctx context.Context, id string) (*ApiResponse[PostThreadActionsResponse], error) {
+	return s.PerformAction(ctx, id, &PostThreadActionsRequest{Action: "mark_as_read"})
+}
+
+// MarkAsUnread marks all messages in a thread as unread
+func (s *ThreadService) MarkAsUnread(ctx context.Context, id string) (*ApiResponse[PostThreadActionsResponse], error) {
+	return s.PerformAction(ctx, id, &PostThreadActionsRequest{Action: "mark_as_unread"})
+}
+
+// Archive archives a thread
+func (s *ThreadService) Archive(ctx context.Context, id string) (*ApiResponse[PostThreadActionsResponse], error) {
+	return s.PerformAction(ctx, id, &PostThreadActionsRequest{Action: "archive"})
+}
+
+// Unarchive unarchives a thread
+func (s *ThreadService) Unarchive(ctx context.Context, id string) (*ApiResponse[PostThreadActionsResponse], error) {
+	return s.PerformAction(ctx, id, &PostThreadActionsRequest{Action: "unarchive"})
+}
+
 // Add service properties to the main client
 func (c *Inbound) Mail() *MailService {
 	return NewMailService(c)
@@ -566,6 +627,10 @@ func (c *Inbound) Domain() *DomainService {
 
 func (c *Inbound) Endpoint() *EndpointService {
 	return NewEndpointService(c)
+}
+
+func (c *Inbound) Thread() *ThreadService {
+	return NewThreadService(c)
 }
 
 // Convenience Methods

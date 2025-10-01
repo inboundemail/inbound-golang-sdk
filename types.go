@@ -208,18 +208,19 @@ type CatchAllEndpoint struct {
 }
 
 type DNSRecord struct {
-	Type        string    `json:"type"`
-	Name        string    `json:"name"`
-	Value       string    `json:"value"`
-	Status      string    `json:"status"`
-	LastChecked time.Time `json:"lastChecked"`
+	Type       string  `json:"type"`
+	Name       string  `json:"name"`
+	Value      string  `json:"value"`
+	IsVerified bool    `json:"isVerified,omitempty"`
+	Status     string  `json:"status,omitempty"`
+	Error      *string `json:"error,omitempty"`
 }
 
 type VerificationCheck struct {
 	DNSRecords      []DNSRecord `json:"dnsRecords,omitempty"`
 	SESStatus       string      `json:"sesStatus,omitempty"`
 	IsFullyVerified bool        `json:"isFullyVerified,omitempty"`
-	LastChecked     *time.Time  `json:"lastChecked,omitempty"`
+	LastChecked     string      `json:"lastChecked,omitempty"`
 }
 
 type DomainStats struct {
@@ -261,9 +262,10 @@ type GetDomainsResponse struct {
 	Data       []DomainWithStats `json:"data"`
 	Pagination Pagination        `json:"pagination"`
 	Meta       struct {
-		TotalCount      int            `json:"totalCount"`
-		VerifiedCount   int            `json:"verifiedCount"`
-		StatusBreakdown map[string]int `json:"statusBreakdown"`
+		TotalCount        int            `json:"totalCount"`
+		VerifiedCount     int            `json:"verifiedCount"`
+		WithCatchAllCount int            `json:"withCatchAllCount"`
+		StatusBreakdown   map[string]int `json:"statusBreakdown"`
 	} `json:"meta"`
 }
 
@@ -463,6 +465,7 @@ type GetEmailByIDResponse struct {
 // Reply API Types
 type PostEmailReplyRequest struct {
 	From            string            `json:"from"`
+	FromName        *string           `json:"from_name,omitempty"`
 	To              any               `json:"to,omitempty"`  // string or []string
 	CC              any               `json:"cc,omitempty"`  // string or []string
 	BCC             any               `json:"bcc,omitempty"` // string or []string
@@ -474,10 +477,17 @@ type PostEmailReplyRequest struct {
 	Attachments     []AttachmentData  `json:"attachments,omitempty"`
 	Tags            []EmailTag        `json:"tags,omitempty"`
 	IncludeOriginal *bool             `json:"includeOriginal,omitempty"`
+	ReplyAll        *bool             `json:"replyAll,omitempty"`
+	Simple          *bool             `json:"simple,omitempty"`
 }
 
 type PostEmailReplyResponse struct {
-	ID string `json:"id"`
+	ID                string  `json:"id"`
+	MessageID         string  `json:"messageId"`
+	AWSMessageID      *string `json:"awsMessageId,omitempty"`
+	RepliedToEmailID  string  `json:"repliedToEmailId"`
+	RepliedToThreadID *string `json:"repliedToThreadId,omitempty"`
+	IsThreadReply     bool    `json:"isThreadReply"`
 }
 
 // Email Scheduling API Types
@@ -558,6 +568,157 @@ type DeleteScheduledEmailResponse struct {
 	ID          string `json:"id"`
 	Status      string `json:"status"` // 'cancelled'
 	CancelledAt string `json:"cancelled_at"`
+}
+
+// Threads API Types
+type ThreadLatestMessage struct {
+	ID             string  `json:"id"`
+	Type           string  `json:"type"` // 'inbound' | 'outbound'
+	Subject        *string `json:"subject"`
+	FromText       string  `json:"fromText"`
+	TextPreview    *string `json:"textPreview"`
+	IsRead         bool    `json:"isRead"`
+	HasAttachments bool    `json:"hasAttachments"`
+	Date           *string `json:"date"`
+}
+
+type ThreadSummary struct {
+	ID                string                `json:"id"`
+	RootMessageID     string                `json:"rootMessageId"`
+	NormalizedSubject *string               `json:"normalizedSubject"`
+	ParticipantEmails []string              `json:"participantEmails"`
+	MessageCount      int                   `json:"messageCount"`
+	LastMessageAt     string                `json:"lastMessageAt"`
+	CreatedAt         string                `json:"createdAt"`
+	HasUnread         bool                  `json:"hasUnread"`
+	IsArchived        bool                  `json:"isArchived"`
+	LatestMessage     *ThreadLatestMessage  `json:"latestMessage,omitempty"`
+}
+
+type GetThreadsRequest struct {
+	Limit    *int   `json:"limit,omitempty"`
+	Offset   *int   `json:"offset,omitempty"`
+	Search   string `json:"search,omitempty"`
+	Unread   *bool  `json:"unread,omitempty"`
+	Archived *bool  `json:"archived,omitempty"`
+	Domain   string `json:"domain,omitempty"`
+	Address  string `json:"address,omitempty"`
+}
+
+type GetThreadsFilters struct {
+	Search       *string `json:"search,omitempty"`
+	UnreadOnly   *bool   `json:"unreadOnly,omitempty"`
+	ArchivedOnly *bool   `json:"archivedOnly,omitempty"`
+	Domain       *string `json:"domain,omitempty"`
+	Address      *string `json:"address,omitempty"`
+}
+
+type GetThreadsResponse struct {
+	Threads    []ThreadSummary   `json:"threads"`
+	Pagination Pagination        `json:"pagination"`
+	Filters    GetThreadsFilters `json:"filters"`
+}
+
+type ThreadAttachment struct {
+	Filename            string `json:"filename"`
+	ContentType         string `json:"contentType"`
+	Size                int    `json:"size"`
+	ContentID           string `json:"contentId"`
+	ContentDisposition  string `json:"contentDisposition"`
+}
+
+type ThreadMessage struct {
+	ID             string             `json:"id"`
+	MessageID      *string            `json:"messageId"`
+	Type           string             `json:"type"` // 'inbound' | 'outbound'
+	ThreadPosition int                `json:"threadPosition"`
+	Subject        *string            `json:"subject"`
+	TextBody       *string            `json:"textBody"`
+	HTMLBody       *string            `json:"htmlBody"`
+	From           string             `json:"from"`
+	FromName       *string            `json:"fromName"`
+	FromAddress    *string            `json:"fromAddress"`
+	To             []string           `json:"to"`
+	CC             []string           `json:"cc"`
+	BCC            []string           `json:"bcc"`
+	Date           *string            `json:"date"`
+	ReceivedAt     *string            `json:"receivedAt"`
+	SentAt         *string            `json:"sentAt"`
+	IsRead         bool               `json:"isRead"`
+	ReadAt         *string            `json:"readAt"`
+	HasAttachments bool               `json:"hasAttachments"`
+	Attachments    []ThreadAttachment `json:"attachments"`
+	InReplyTo      *string            `json:"inReplyTo"`
+	References     []string           `json:"references"`
+	Headers        map[string]any     `json:"headers"`
+	Tags           []EmailTag         `json:"tags,omitempty"`
+	Status         *string            `json:"status,omitempty"`
+	FailureReason  *string            `json:"failureReason,omitempty"`
+}
+
+type ThreadMetadata struct {
+	ID                string   `json:"id"`
+	RootMessageID     string   `json:"rootMessageId"`
+	NormalizedSubject *string  `json:"normalizedSubject"`
+	ParticipantEmails []string `json:"participantEmails"`
+	MessageCount      int      `json:"messageCount"`
+	LastMessageAt     string   `json:"lastMessageAt"`
+	CreatedAt         string   `json:"createdAt"`
+	UpdatedAt         string   `json:"updatedAt"`
+}
+
+type GetThreadByIDResponse struct {
+	Thread     ThreadMetadata  `json:"thread"`
+	Messages   []ThreadMessage `json:"messages"`
+	TotalCount int             `json:"totalCount"`
+}
+
+type PostThreadActionsRequest struct {
+	Action string `json:"action"` // 'mark_as_read' | 'mark_as_unread' | 'archive' | 'unarchive'
+}
+
+type PostThreadActionsResponse struct {
+	Success          bool   `json:"success"`
+	Action           string `json:"action"`
+	ThreadID         string `json:"threadId"`
+	AffectedMessages int    `json:"affectedMessages"`
+	Message          string `json:"message"`
+}
+
+type ThreadDistribution struct {
+	SingleMessageThreads int `json:"singleMessageThreads"`
+	ShortThreads         int `json:"shortThreads"`
+	MediumThreads        int `json:"mediumThreads"`
+	LongThreads          int `json:"longThreads"`
+}
+
+type ThreadRecentActivity struct {
+	ThreadsToday     int `json:"threadsToday"`
+	MessagesToday    int `json:"messagesToday"`
+	ThreadsThisWeek  int `json:"threadsThisWeek"`
+	MessagesThisWeek int `json:"messagesThisWeek"`
+}
+
+type ThreadUnreadStats struct {
+	UnreadThreads  int `json:"unreadThreads"`
+	UnreadMessages int `json:"unreadMessages"`
+}
+
+type MostActiveThread struct {
+	ThreadID      string  `json:"threadId"`
+	MessageCount  int     `json:"messageCount"`
+	Subject       *string `json:"subject"`
+	LastMessageAt string  `json:"lastMessageAt"`
+}
+
+type GetThreadStatsResponse struct {
+	TotalThreads            int                  `json:"totalThreads"`
+	TotalMessages           int                  `json:"totalMessages"`
+	AverageMessagesPerThread float64             `json:"averageMessagesPerThread"`
+	MostActiveThread        *MostActiveThread    `json:"mostActiveThread"`
+	RecentActivity          ThreadRecentActivity `json:"recentActivity"`
+	Distribution            ThreadDistribution   `json:"distribution"`
+	UnreadStats             ThreadUnreadStats    `json:"unreadStats"`
 }
 
 // Webhook Payload Types - for incoming email.received webhooks

@@ -764,6 +764,7 @@ type WebhookParsedData struct {
 	References  *string              `json:"references,omitempty"`
 	TextBody    string               `json:"textBody"`
 	HTMLBody    string               `json:"htmlBody"`
+	Raw         string               `json:"raw"`
 	Attachments []WebhookAttachment  `json:"attachments"`
 	Headers     map[string]any       `json:"headers"`
 	Priority    *string              `json:"priority,omitempty"`
@@ -779,11 +780,12 @@ type WebhookCleanedContent struct {
 }
 
 type WebhookAttachment struct {
-	Filename    string `json:"filename"`
-	ContentType string `json:"contentType"`
-	ContentID   string `json:"contentId"`
-	URL         string `json:"url"`
-	DownloadUrl string `json:"downloadUrl"`
+	Filename            string `json:"filename"`
+	ContentType         string `json:"contentType"`
+	Size                int    `json:"size"`
+	ContentID           string `json:"contentId"`
+	ContentDisposition  string `json:"contentDisposition"`
+	DownloadUrl         string `json:"downloadUrl"`
 }
 
 type WebhookEndpointRef struct {

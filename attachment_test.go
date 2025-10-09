@@ -106,20 +106,20 @@ func TestAttachmentDownload(t *testing.T) {
 			data, err := client.Attachment().Download(context.Background(), tt.emailID, tt.filename)
 
 			if tt.expectError {
-			if err == nil {
-			t.Error("Expected error but got none")
-			 return
-			}
-			 if tt.errorContains != "" && !strings.Contains(err.Error(), tt.errorContains) {
-				t.Errorf("Expected error to contain '%s', got '%s'", tt.errorContains, err.Error())
-			 }
-			return
+				if err == nil {
+					t.Error("Expected error but got none")
+					return
+				}
+				if tt.errorContains != "" && !strings.Contains(err.Error(), tt.errorContains) {
+					t.Errorf("Expected error to contain '%s', got '%s'", tt.errorContains, err.Error())
+				}
+				return
 			}
 
-		if err != nil {
-			t.Errorf("Unexpected error: %v", err)
-			return
-		}
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+				return
+			}
 
 			if string(data) != string(tt.serverResponse) {
 				t.Errorf("Expected data '%s', got '%s'", string(tt.serverResponse), string(data))

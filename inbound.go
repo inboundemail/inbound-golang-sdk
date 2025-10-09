@@ -612,6 +612,42 @@ func (s *ThreadService) Unarchive(ctx context.Context, id string) (*ApiResponse[
 	return s.PerformAction(ctx, id, &PostThreadActionsRequest{Action: "unarchive"})
 }
 
+// AttachmentService handles attachment operations
+type AttachmentService struct {
+	client *Inbound
+}
+
+// NewAttachmentService creates a new attachment service
+func NewAttachmentService(client *Inbound) *AttachmentService {
+	return &AttachmentService{client: client}
+}
+
+// Download downloads an email attachment by email ID and filename
+//
+// API Reference: https://docs.inbound.new/api-reference/attachments/download-attachment
+func (s *AttachmentService) Download(ctx context.Context, emailID, filename string) ([]byte, error) {
+	endpoint := fmt.Sprintf("/attachments/%s/%s", emailID, url.PathEscape(filename))
+	
+	resp, err := s.client.request(ctx, "GET", endpoint, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		respBody, _ := io.ReadAll(resp.Body)
+		var errorResp struct {
+			Error string `json:"error"`
+		}
+		if json.Unmarshal(respBody, &errorResp) == nil && errorResp.Error != "" {
+			return nil, fmt.Errorf("%s", errorResp.Error)
+		}
+		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+
+	return io.ReadAll(resp.Body)
+}
+
 // Add service properties to the main client
 func (c *Inbound) Mail() *MailService {
 	return NewMailService(c)
@@ -631,6 +667,10 @@ func (c *Inbound) Endpoint() *EndpointService {
 
 func (c *Inbound) Thread() *ThreadService {
 	return NewThreadService(c)
+}
+
+func (c *Inbound) Attachment() *AttachmentService {
+	return NewAttachmentService(c)
 }
 
 // Convenience Methods

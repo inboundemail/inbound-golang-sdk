@@ -783,6 +783,7 @@ type WebhookAttachment struct {
 	ContentType string `json:"contentType"`
 	ContentID   string `json:"contentId"`
 	URL         string `json:"url"`
+	DownloadUrl string `json:"downloadUrl"`
 }
 
 type WebhookEndpointRef struct {

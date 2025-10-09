@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -35,25 +37,28 @@ func TestAttachmentDownload(t *testing.T) {
 			expectError:    false,
 		},
 		{
-			name:         "email not found",
-			emailID:      "non-existent",
-			filename:     "document.pdf",
-			serverStatus: http.StatusNotFound,
-			expectError:  true,
+			name:          "email not found",
+			emailID:       "non-existent",
+			filename:      "document.pdf",
+			serverStatus:  http.StatusNotFound,
+			expectError:   true,
+			errorContains: "Error occurred",
 		},
 		{
-			name:         "attachment not found",
-			emailID:      "test-email-id",
-			filename:     "missing.pdf",
-			serverStatus: http.StatusNotFound,
-			expectError:  true,
+			name:          "attachment not found",
+			emailID:       "test-email-id",
+			filename:      "missing.pdf",
+			serverStatus:  http.StatusNotFound,
+			expectError:   true,
+			errorContains: "Error occurred",
 		},
 		{
-			name:         "unauthorized",
-			emailID:      "test-email-id",
-			filename:     "document.pdf",
-			serverStatus: http.StatusUnauthorized,
-			expectError:  true,
+			name:          "unauthorized",
+			emailID:       "test-email-id",
+			filename:      "document.pdf",
+			serverStatus:  http.StatusUnauthorized,
+			expectError:   true,
+			errorContains: "Error occurred",
 		},
 	}
 
@@ -63,6 +68,12 @@ func TestAttachmentDownload(t *testing.T) {
 				// Verify method
 				if r.Method != "GET" {
 					t.Errorf("Expected GET request, got %s", r.Method)
+				}
+
+				// Verify URL path
+				expectedPath := "/attachments/" + tt.emailID + "/" + url.PathEscape(tt.filename)
+				if r.URL.EscapedPath() != expectedPath {
+					t.Errorf("Expected path '%s', got '%s'", expectedPath, r.URL.EscapedPath())
 				}
 
 				// Verify auth header
@@ -95,16 +106,20 @@ func TestAttachmentDownload(t *testing.T) {
 			data, err := client.Attachment().Download(context.Background(), tt.emailID, tt.filename)
 
 			if tt.expectError {
-				if err == nil {
-					t.Error("Expected error but got none")
-				}
-				return
+			if err == nil {
+			t.Error("Expected error but got none")
+			 return
+			}
+			 if tt.errorContains != "" && !strings.Contains(err.Error(), tt.errorContains) {
+				t.Errorf("Expected error to contain '%s', got '%s'", tt.errorContains, err.Error())
+			 }
+			return
 			}
 
-			if err != nil {
-				t.Errorf("Unexpected error: %v", err)
-				return
-			}
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+			return
+		}
 
 			if string(data) != string(tt.serverResponse) {
 				t.Errorf("Expected data '%s', got '%s'", string(tt.serverResponse), string(data))

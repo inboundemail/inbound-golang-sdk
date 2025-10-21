@@ -301,7 +301,7 @@ func NewEmailService(client *Inbound) *EmailService {
 }
 
 // Send sends an email with optional attachments and idempotency options
-// 
+//
 // This method supports both immediate sending and scheduled delivery.
 // If params.ScheduledAt is set, the email will be scheduled for future delivery.
 //
@@ -345,7 +345,7 @@ func (s *EmailService) Reply(ctx context.Context, id string, params *PostEmailRe
 }
 
 // Schedule schedules an email to be sent at a future time
-// 
+//
 // Supports both ISO 8601 dates and natural language (e.g., "in 1 hour", "tomorrow at 9am").
 //
 // API Reference: https://docs.inbound.new/api-reference/emails/schedule-email
@@ -625,27 +625,28 @@ func NewAttachmentService(client *Inbound) *AttachmentService {
 // Download downloads an email attachment by email ID and filename
 //
 // API Reference: https://docs.inbound.new/api-reference/attachments/download-attachment
-func (s *AttachmentService) Download(ctx context.Context, emailID, filename string) ([]byte, error) {
+func (s *AttachmentService) Download(ctx context.Context, emailID, filename string) (*AttachmentDownloadResponse, error) {
 	endpoint := fmt.Sprintf("/attachments/%s/%s", emailID, url.PathEscape(filename))
-	
+
 	resp, err := s.client.request(ctx, "GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	if resp.StatusCode >= 400 {
-		respBody, _ := io.ReadAll(resp.Body)
-		var errorResp struct {
-			Error string `json:"error"`
-		}
-		if json.Unmarshal(respBody, &errorResp) == nil && errorResp.Error != "" {
-			return nil, fmt.Errorf("%s", errorResp.Error)
-		}
 		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, resp.Status)
 	}
 
-	return io.ReadAll(resp.Body)
+	return &AttachmentDownloadResponse{
+		Data:    data,
+		Headers: resp.Header,
+	}, nil
 }
 
 // Add service properties to the main client

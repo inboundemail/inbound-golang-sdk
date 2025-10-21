@@ -42,7 +42,7 @@ func TestAttachmentDownload(t *testing.T) {
 			filename:      "document.pdf",
 			serverStatus:  http.StatusNotFound,
 			expectError:   true,
-			errorContains: "Error occurred",
+			errorContains: "404",
 		},
 		{
 			name:          "attachment not found",
@@ -50,7 +50,7 @@ func TestAttachmentDownload(t *testing.T) {
 			filename:      "missing.pdf",
 			serverStatus:  http.StatusNotFound,
 			expectError:   true,
-			errorContains: "Error occurred",
+			errorContains: "404",
 		},
 		{
 			name:          "unauthorized",
@@ -58,7 +58,7 @@ func TestAttachmentDownload(t *testing.T) {
 			filename:      "document.pdf",
 			serverStatus:  http.StatusUnauthorized,
 			expectError:   true,
-			errorContains: "Error occurred",
+			errorContains: "401",
 		},
 	}
 
@@ -103,7 +103,7 @@ func TestAttachmentDownload(t *testing.T) {
 				t.Fatalf("Failed to create client: %v", err)
 			}
 
-			data, err := client.Attachment().Download(context.Background(), tt.emailID, tt.filename)
+			result, err := client.Attachment().Download(context.Background(), tt.emailID, tt.filename)
 
 			if tt.expectError {
 				if err == nil {
@@ -121,8 +121,16 @@ func TestAttachmentDownload(t *testing.T) {
 				return
 			}
 
-			if string(data) != string(tt.serverResponse) {
-				t.Errorf("Expected data '%s', got '%s'", string(tt.serverResponse), string(data))
+			if string(result.Data) != string(tt.serverResponse) {
+				t.Errorf("Expected data '%s', got '%s'", string(tt.serverResponse), string(result.Data))
+			}
+
+			// Verify headers are present
+			if result.Headers == nil {
+				t.Error("Expected headers to be present")
+			}
+			if result.Headers.Get("Content-Type") != "application/pdf" {
+				t.Errorf("Expected Content-Type 'application/pdf', got '%s'", result.Headers.Get("Content-Type"))
 			}
 		})
 	}

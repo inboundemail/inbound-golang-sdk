@@ -1,6 +1,9 @@
 package inboundgo
 
-import "time"
+import (
+	"net/http"
+	"time"
+)
 
 // Base configuration
 type InboundEmailConfig struct {
@@ -583,16 +586,16 @@ type ThreadLatestMessage struct {
 }
 
 type ThreadSummary struct {
-	ID                string                `json:"id"`
-	RootMessageID     string                `json:"rootMessageId"`
-	NormalizedSubject *string               `json:"normalizedSubject"`
-	ParticipantEmails []string              `json:"participantEmails"`
-	MessageCount      int                   `json:"messageCount"`
-	LastMessageAt     string                `json:"lastMessageAt"`
-	CreatedAt         string                `json:"createdAt"`
-	HasUnread         bool                  `json:"hasUnread"`
-	IsArchived        bool                  `json:"isArchived"`
-	LatestMessage     *ThreadLatestMessage  `json:"latestMessage,omitempty"`
+	ID                string               `json:"id"`
+	RootMessageID     string               `json:"rootMessageId"`
+	NormalizedSubject *string              `json:"normalizedSubject"`
+	ParticipantEmails []string             `json:"participantEmails"`
+	MessageCount      int                  `json:"messageCount"`
+	LastMessageAt     string               `json:"lastMessageAt"`
+	CreatedAt         string               `json:"createdAt"`
+	HasUnread         bool                 `json:"hasUnread"`
+	IsArchived        bool                 `json:"isArchived"`
+	LatestMessage     *ThreadLatestMessage `json:"latestMessage,omitempty"`
 }
 
 type GetThreadsRequest struct {
@@ -620,11 +623,11 @@ type GetThreadsResponse struct {
 }
 
 type ThreadAttachment struct {
-	Filename            string `json:"filename"`
-	ContentType         string `json:"contentType"`
-	Size                int    `json:"size"`
-	ContentID           string `json:"contentId"`
-	ContentDisposition  string `json:"contentDisposition"`
+	Filename           string `json:"filename"`
+	ContentType        string `json:"contentType"`
+	Size               int    `json:"size"`
+	ContentID          string `json:"contentId"`
+	ContentDisposition string `json:"contentDisposition"`
 }
 
 type ThreadMessage struct {
@@ -712,33 +715,33 @@ type MostActiveThread struct {
 }
 
 type GetThreadStatsResponse struct {
-	TotalThreads            int                  `json:"totalThreads"`
-	TotalMessages           int                  `json:"totalMessages"`
-	AverageMessagesPerThread float64             `json:"averageMessagesPerThread"`
-	MostActiveThread        *MostActiveThread    `json:"mostActiveThread"`
-	RecentActivity          ThreadRecentActivity `json:"recentActivity"`
-	Distribution            ThreadDistribution   `json:"distribution"`
-	UnreadStats             ThreadUnreadStats    `json:"unreadStats"`
+	TotalThreads             int                  `json:"totalThreads"`
+	TotalMessages            int                  `json:"totalMessages"`
+	AverageMessagesPerThread float64              `json:"averageMessagesPerThread"`
+	MostActiveThread         *MostActiveThread    `json:"mostActiveThread"`
+	RecentActivity           ThreadRecentActivity `json:"recentActivity"`
+	Distribution             ThreadDistribution   `json:"distribution"`
+	UnreadStats              ThreadUnreadStats    `json:"unreadStats"`
 }
 
 // Webhook Payload Types - for incoming email.received webhooks
 type WebhookPayload struct {
-	Event     string              `json:"event"`
-	Timestamp string              `json:"timestamp"`
-	Email     WebhookEmailData    `json:"email"`
-	Endpoint  *WebhookEndpointRef `json:"endpoint,omitempty"`
+	Event     string             `json:"event"`
+	Timestamp string             `json:"timestamp"`
+	Email     WebhookEmailData   `json:"email"`
+	Endpoint  WebhookEndpointRef `json:"endpoint"`
 }
 
 type WebhookEmailData struct {
-	ID             string                 `json:"id"`
-	MessageID      string                 `json:"messageId"`
-	From           WebhookAddressGroup    `json:"from"`
-	To             WebhookAddressGroup    `json:"to"`
-	Recipient      string                 `json:"recipient"`
-	Subject        string                 `json:"subject"`
-	ReceivedAt     string                 `json:"receivedAt"`
-	ParsedData     WebhookParsedData      `json:"parsedData"`
-	CleanedContent *WebhookCleanedContent `json:"cleanedContent,omitempty"`
+	ID             string                `json:"id"`
+	MessageID      *string               `json:"messageId"`
+	From           *WebhookAddressGroup  `json:"from"`
+	To             *WebhookAddressGroup  `json:"to"`
+	Recipient      string                `json:"recipient"`
+	Subject        *string               `json:"subject"`
+	ReceivedAt     string                `json:"receivedAt"`
+	ParsedData     WebhookParsedData     `json:"parsedData"`
+	CleanedContent WebhookCleanedContent `json:"cleanedContent"`
 }
 
 type WebhookAddressGroup struct {
@@ -748,31 +751,31 @@ type WebhookAddressGroup struct {
 
 type WebhookAddress struct {
 	Name    *string `json:"name"`
-	Address string  `json:"address"`
+	Address *string `json:"address"`
 }
 
 type WebhookParsedData struct {
-	MessageID   string               `json:"messageId"`
-	Date        any                  `json:"date"` // Can be string or Date object
-	Subject     string               `json:"subject"`
-	From        WebhookAddressGroup  `json:"from"`
-	To          WebhookAddressGroup  `json:"to"`
+	MessageID   *string              `json:"messageId,omitempty"`
+	Date        *string              `json:"date,omitempty"`
+	Subject     *string              `json:"subject,omitempty"`
+	From        *WebhookAddressGroup `json:"from"`
+	To          *WebhookAddressGroup `json:"to"`
 	Cc          *WebhookAddressGroup `json:"cc"`
 	Bcc         *WebhookAddressGroup `json:"bcc"`
 	ReplyTo     *WebhookAddressGroup `json:"replyTo"`
 	InReplyTo   *string              `json:"inReplyTo,omitempty"`
-	References  *string              `json:"references,omitempty"`
-	TextBody    string               `json:"textBody"`
-	HTMLBody    string               `json:"htmlBody"`
-	Raw         string               `json:"raw"`
+	References  []string             `json:"references,omitempty"`
+	TextBody    *string              `json:"textBody,omitempty"`
+	HTMLBody    *string              `json:"htmlBody,omitempty"`
+	Raw         *string              `json:"raw,omitempty"`
 	Attachments []WebhookAttachment  `json:"attachments"`
 	Headers     map[string]any       `json:"headers"`
-	Priority    *string              `json:"priority,omitempty"`
+	Priority    any                  `json:"priority,omitempty"` // Can be string | false | undefined
 }
 
 type WebhookCleanedContent struct {
-	HTML        string              `json:"html"`
-	Text        string              `json:"text"`
+	HTML        *string             `json:"html"`
+	Text        *string             `json:"text"`
 	HasHTML     bool                `json:"hasHtml"`
 	HasText     bool                `json:"hasText"`
 	Attachments []WebhookAttachment `json:"attachments"`
@@ -780,16 +783,24 @@ type WebhookCleanedContent struct {
 }
 
 type WebhookAttachment struct {
-	Filename            string `json:"filename"`
-	ContentType         string `json:"contentType"`
-	Size                int    `json:"size"`
-	ContentID           string `json:"contentId"`
-	ContentDisposition  string `json:"contentDisposition"`
-	DownloadUrl         string `json:"downloadUrl"`
+	Filename           *string `json:"filename,omitempty"`
+	ContentType        *string `json:"contentType,omitempty"`
+	Size               *int    `json:"size,omitempty"`
+	ContentID          *string `json:"contentId,omitempty"`
+	ContentDisposition *string `json:"contentDisposition,omitempty"`
+	DownloadUrl        string  `json:"downloadUrl"`
 }
 
 type WebhookEndpointRef struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 	Type string `json:"type"`
+}
+
+// ---- Attachment Types ----
+
+// AttachmentDownloadResponse represents the response from downloading an attachment.
+type AttachmentDownloadResponse struct {
+	Data    []byte      `json:"data"`
+	Headers http.Header `json:"headers"`
 }

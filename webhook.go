@@ -19,24 +19,30 @@ func ParseWebhookPayload(reader io.Reader) (*WebhookPayload, error) {
 
 // GetFromAddress extracts the properly formatted from address from the webhook
 func (w *WebhookPayload) GetFromAddress() string {
-	if len(w.Email.From.Addresses) > 0 {
+	if w.Email.From != nil && len(w.Email.From.Addresses) > 0 {
 		addr := w.Email.From.Addresses[0]
-		if addr.Name != nil && *addr.Name != "" {
-			return fmt.Sprintf("%s <%s>", *addr.Name, addr.Address)
+		if addr.Address == nil {
+			return ""
 		}
-		return addr.Address
+		if addr.Name != nil && *addr.Name != "" {
+			return fmt.Sprintf("%s <%s>", *addr.Name, *addr.Address)
+		}
+		return *addr.Address
 	}
 	return ""
 }
 
 // GetToAddress extracts the properly formatted to address from the webhook
 func (w *WebhookPayload) GetToAddress() string {
-	if len(w.Email.To.Addresses) > 0 {
+	if w.Email.To != nil && len(w.Email.To.Addresses) > 0 {
 		addr := w.Email.To.Addresses[0]
-		if addr.Name != nil && *addr.Name != "" {
-			return fmt.Sprintf("%s <%s>", *addr.Name, addr.Address)
+		if addr.Address == nil {
+			return ""
 		}
-		return addr.Address
+		if addr.Name != nil && *addr.Name != "" {
+			return fmt.Sprintf("%s <%s>", *addr.Name, *addr.Address)
+		}
+		return *addr.Address
 	}
 	return ""
 }
